@@ -15,31 +15,35 @@ namespace RedisBasic.Controllers
         public HomeController(IDistributedCache distributedCache)
         {
             _disturbutedCache = distributedCache;
-
-            Person person = new Person();
-            person.Name = "Arya";
-            person.Surname = "Kaşmer";
-            person.Age = 0;
-            person.isMail = false;
-
-            var data = JsonConvert.SerializeObject(person);//serialize
-            _disturbutedCache.SetString("Person", data); // keep object in cache
         }
+        
+
         public async Task<IActionResult> Index()
         {
+            Person person = new Person
+            {
+                Name = "Arya",
+                Surname = "Kaşmer",
+                Age = 0,
+                isMail = false
+            };
             var cacheKey = "Time";
-            var limit = TimeSpan.FromSeconds(5);
+            var slide = TimeSpan.FromSeconds(5);
+            var max = TimeSpan.FromSeconds(5);
             var existingTime = _disturbutedCache.GetString(cacheKey);//get string with cachekey
             if (string.IsNullOrEmpty(existingTime))
             {
                 existingTime = DateTime.UtcNow.ToString();
-                var option = new DistributedCacheEntryOptions().SetSlidingExpiration(limit);//when data deduct from cache (timeout)
-                option.AbsoluteExpirationRelativeToNow = limit;// latest deduct time(latest timeout
+                var option = new DistributedCacheEntryOptions();
+                //option.SetSlidingExpiration(slide); after first work it sliding Expiration  5 sec
+                option.AbsoluteExpirationRelativeToNow = max;//Expiration Time
+                var data = JsonConvert.SerializeObject(person);//serialize
+                _disturbutedCache.SetString("Person", data, option); // keep object in cache
                 await _disturbutedCache.SetStringAsync(cacheKey, $"{existingTime}", option);// change cachekey string with existingtime, after that set timeout we selected before
             }
             ViewBag.Time = await _disturbutedCache.GetStringAsync(cacheKey);//get string from cache
-            var person = await _disturbutedCache.GetStringAsync("Person");//get person object data from cache
-            var person2 = JsonConvert.DeserializeObject<Person>(person);// deserialize 
+            var person1 = await _disturbutedCache.GetStringAsync("Person");//get person object data from cache
+            var person2 = JsonConvert.DeserializeObject<Person>(person1);// deserialize 
             return View(person2);
         }
     }
