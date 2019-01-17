@@ -1,0 +1,32 @@
+﻿@model RedisBasic.Models.Person
+
+@{
+    ViewData["Title"] = "Stack";
+}
+
+<h1>@ViewBag.data</h1>
+
+
+<h3><b>Person:</b></h3>
+
+<table class="table">
+    <tr>
+        <td>Ad:</td>
+        <td>@Model.Name</td>
+    </tr>
+    <tr>
+        <td>Soyad:</td>
+        <td>@Model.Surname</td>
+    </tr>
+    <tr>
+        <td>Yaş:</td>
+        <td>@Model.Age</td>
+    </tr>
+    <tr>
+        <td>Cinsiyet:</td>
+        <td>
+            <input type="checkbox" name="gender" id="gender" checked="@Model.isMail">Erkek
+            <input type="checkbox" name="gender" id="gender" checked="!@Model.isMail">Kız
+        </td>
+    </tr>
+</table>
